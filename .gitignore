@@ -1,0 +1,11 @@
+# Editor Settings
+.vscode/
+
+# Generated Directory
+build/
+waves/
+
+# Generated Files-types
+*.out
+*.vvp
+*.vcd
