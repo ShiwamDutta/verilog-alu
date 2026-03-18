@@ -2,29 +2,30 @@
 
 // 8-bit Booth multiplier
 module multiplier_8bit (
-    input [7:0] multiplier, multiplicand,
-    output reg [15:0] product, 
+    input signed [7:0] multiplier, multiplicand,
+    output reg signed [15:0] product,
     output reg zero
 );
 
     integer i;
-    reg last;
+    reg signed [8:0] m;
+    reg signed [17:0] comb; // {[A (9 bits)] [Q (8 bits)] [Q-1 (1 bit)]}
 
     always @(*) begin
 
-        product = {8'b0, multiplier};
-        last = 0;
+        m = {multiplicand[7], multiplicand};
+        comb = {9'b0, multiplier, 1'b0};
 
         for (i=0; i<8; i=i+1) begin
-            case ({product[0], last})
-                2'b01: product[15:8] = product[15:8] + multiplicand;
-                2'b10: product[15:8] = product[15:8] - multiplicand;
+            case (comb[1:0])
+                2'b01: comb[17:9] = comb[17:9] + m;
+                2'b10: comb[17:9] = comb[17:9] - m;
                 default: ;
             endcase
-            last = product[0];
-            product = {product[15], product[15:1]}; // R-Shift
+            comb = comb >>> 1; // R-Shift
         end
 
+        product = comb[16:1]; // {[A (lower 8 bits)] [Q (8 bits)]}
         zero = ~|product;
     end
 
