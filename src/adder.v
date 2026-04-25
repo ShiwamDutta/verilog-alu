@@ -1,5 +1,11 @@
 `timescale 1ns/1ps
 
+// NOTE:
+// Standalone CLA-based adder module.
+// Implemented during initial design exploration.
+// Not integrated into ALU (adder-subtractor used instead).
+// Retained for reference and comparison.
+
 module adder_8bit (
     input  [7:0] x,
     input  [7:0] y,
