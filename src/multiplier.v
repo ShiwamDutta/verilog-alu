@@ -1,31 +1,37 @@
 `timescale 1ns/1ps
 
-// 8-bit Booth multiplier
-module multiplier_8bit (
-    input signed [7:0] multiplier, multiplicand,
-    output reg signed [15:0] product,
+// Combinational Booth multiplier
+module multiplier #(
+    parameter WIDTH = 8
+) (
+    input signed [WIDTH - 1 : 0] multiplier, multiplicand,
+    output reg signed [2 * WIDTH - 1 : 0] product,
     output reg zero
 );
 
     integer i;
-    reg signed [8:0] m;
-    reg signed [17:0] comb; // {[A (9 bits)] [Q (8 bits)] [Q-1 (1 bit)]}
+    reg signed [WIDTH:0] m;
+    reg signed [2 * WIDTH + 1 : 0] comb; // [A (W+1) | Q (W) | Q-1 (1)]
 
     always @(*) begin
 
-        m = {multiplicand[7], multiplicand};
-        comb = {9'b0, multiplier, 1'b0};
+        m = {multiplicand[WIDTH - 1], multiplicand};
+        // comb = {A=0, Q=multiplier, Q-1=0}
+        comb = {{(WIDTH + 1){1'b0}}, multiplier, 1'b0};
 
-        for (i=0; i<8; i=i+1) begin
+        for (i = 0; i < WIDTH; i = i + 1) begin
             case (comb[1:0])
-                2'b01: comb[17:9] = comb[17:9] + m;
-                2'b10: comb[17:9] = comb[17:9] - m;
+                2'b01: comb[2 * WIDTH + 1 : WIDTH + 1] =
+                        comb[2 * WIDTH + 1 : WIDTH + 1] + m;
+                2'b10: comb[2 * WIDTH + 1 : WIDTH + 1] =
+                        comb[2 * WIDTH + 1 : WIDTH + 1] - m;
                 default: ;
             endcase
             comb = comb >>> 1; // R-Shift
         end
 
-        product = comb[16:1]; // {[A (lower 8 bits)] [Q (8 bits)]}
+        // separate comb register
+        product = comb[2 * WIDTH : 1]; // [A (lower W bit) | Q (W)]
         zero = ~|product;
     end
 

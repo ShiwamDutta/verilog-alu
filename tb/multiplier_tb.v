@@ -6,7 +6,7 @@ module multiplier_8bit_tb;
     wire signed [15:0] product;
     wire zero;
 
-    multiplier_8bit uut(a, b, product, zero);
+    multiplier #(8) uut(a, b, product, zero);
 
     initial begin
         $dumpfile("waves/multiplier.vcd");
