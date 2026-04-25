@@ -1,24 +1,38 @@
 `timescale 1ns/1ps
 
-module adder_sub_8bit (
-    input  [7:0] x, y,
-    input        sub,   // 0=add, 1=sub
-    output [7:0] z,
-    output       c, v, zero
+module adder_sub #(
+    parameter WIDTH = 8
+) (
+    input  [WIDTH - 1 : 0] x, y,
+    input  sub,                     // 0=add, 1=sub
+    output [WIDTH - 1 : 0] z,
+    output c, v, zero
 );
 
-    wire [7:0] y_mux = y ^ {8{sub}};
-    wire nibble_carry, zf1, zf2, o;
+    wire [WIDTH - 1 : 0] y_mux = y ^ {WIDTH{sub}};
 
-    cla_4bit cla1 (
-        x[3:0], y_mux[3:0], sub, 
-        z[3:0], nibble_carry, o, zf1
-    );
-    cla_4bit cla2 (
-        x[7:4], y_mux[7:4], nibble_carry,
-        z[7:4], c, v, zf2
-    );
+    wire [WIDTH / 4 - 1 : 0] zf, overflow;
+    wire [WIDTH / 4 : 0] nibble_carry;
 
-    assign zero = zf1 & zf2;
+    assign nibble_carry[0] = sub;
+
+    genvar i;
+    generate
+        for (i = 0; i < WIDTH / 4 ; i = i + 1) begin
+            cla_4bit cla (
+                .a(x[4 * i + 3 : 4 * i]),
+                .b(y_mux[4 * i + 3 : 4 * i]),
+                .c0(nibble_carry[i]),
+                .sum(z[4 * i + 3 : 4 * i]),
+                .c4(nibble_carry[i + 1]),
+                .overflow(overflow[i]),
+                .zero(zf[i])
+            );
+        end
+    endgenerate
+
+    assign v = overflow[WIDTH / 4 - 1];
+    assign c = nibble_carry[WIDTH / 4];
+    assign zero = &zf;
 
 endmodule

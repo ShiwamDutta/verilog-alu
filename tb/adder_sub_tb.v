@@ -8,7 +8,7 @@ module adder_sub_8bit_tb;
     reg  sub;
     wire c, v, zero;
 
-    adder_sub_8bit uut (x, y, sub, z, c, v, zero);
+    adder_sub #(8) uut (x, y, sub, z, c, v, zero);
 
     initial begin
         $dumpfile("waves/adder_sub.vcd");
