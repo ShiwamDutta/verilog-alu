@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module alu_8bit_tb;
+module alu_tb;
 
     reg signed [7:0] a, b;
     reg [3:0] op;
@@ -9,7 +9,7 @@ module alu_8bit_tb;
     wire carry, overflow, zero, div_by_zero;
 
     // DUT
-    alu_8bit uut (
+    alu #(8) uut (
         .a(a),
         .b(b),
         .op(op),
