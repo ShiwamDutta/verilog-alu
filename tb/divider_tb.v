@@ -6,7 +6,7 @@ module divider_tb;
     wire signed [7:0] q, r;
     wire div_by_zero, overflow;
 
-    divider_8bit uut (d, m, q, r, div_by_zero, overflow);
+    divider #(8) uut (d, m, q, r, div_by_zero, overflow);
 
     initial begin
         $dumpfile("waves/divider.vcd");
@@ -27,4 +27,3 @@ module divider_tb;
     end
 
 endmodule
-

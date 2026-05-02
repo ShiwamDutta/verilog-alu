@@ -1,35 +1,42 @@
 `timescale 1ns/1ps
 
-module divider_8bit (
-    input  signed [7:0] dividend, divisor,
-    output signed [7:0] quotient, remainder,
+module divider #(
+    parameter WIDTH = 8
+) (
+    input  signed [WIDTH - 1 : 0] dividend, divisor,
+    output signed [WIDTH - 1 : 0] quotient, remainder,
     output div_by_zero, overflow
 );
 
-    localparam MIN_INT = 8'h80;
-    localparam NEG_ONE = 8'hFF;
-    localparam MAX_INT = 8'h7F;
+    localparam MAX_INT = {1'b0, {(WIDTH - 1){1'b1}}}; // 011...1
+    localparam MIN_INT = {1'b1, {(WIDTH - 1){1'b0}}}; // 100...0
+    localparam POS_ONE = {{(WIDTH - 1){1'b0}}, 1'b1};   // 000...1
+    localparam NEG_ONE = {WIDTH{1'b1}};               // 111...1
 
     wire sign_d, sign_m, sign_q, sign_r;
 
-    assign sign_d = dividend[7];
-    assign sign_m = divisor[7];
+    // signs of values
+    assign sign_d = dividend[WIDTH - 1];
+    assign sign_m = divisor[WIDTH - 1];
     assign sign_q = sign_d ^ sign_m;
     assign sign_r = sign_d;
 
-    wire [7:0] abs_d, abs_m;
-    wire [7:0] abs_q, abs_r;
+    wire [WIDTH - 1 : 0] abs_d, abs_m;
+    wire [WIDTH - 1 : 0] abs_q, abs_r;
 
-    // absolute values
+    // absolute values (2's complement if negative)
     assign abs_d = sign_d ? (~dividend + 1) : dividend;
     assign abs_m = sign_m ? (~divisor + 1) : divisor;
 
+    // check overflow
+    // if true, adapt dividend and divisor
+    // so that quotient is MAX_INT and remainder is ZERO
     assign overflow = (dividend == MIN_INT) && (divisor == NEG_ONE);
-    wire [7:0] div_d = overflow ? MAX_INT : abs_d;
-    wire [7:0] div_m = overflow ? 8'h01 : abs_m;
+    wire [WIDTH - 1 : 0] div_d = overflow ? MAX_INT : abs_d;
+    wire [WIDTH - 1 : 0] div_m = overflow ? POS_ONE : abs_m;
 
     // unsigned divider
-    divider_unsigned_8bit divide (
+    divider_unsigned #(.WIDTH(WIDTH)) divide (
         .dividend(div_d),
         .divisor(div_m),
         .quotient(abs_q),
@@ -37,7 +44,10 @@ module divider_8bit (
         .div_by_zero(div_by_zero)
     );
 
+    // div_by_zero is handled in divider_unsigned
+    // as ZERO for quotient and dividend for remainder
     // sign correction
+    // as result of divider_unsigned is absolute values
     assign quotient = div_by_zero ? abs_q :
                     (sign_q ? (~abs_q + 1) : abs_q);
 
