@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module alu_tb;
+module alu_tb_8bit;
     localparam WIDTH = 8;
 
     reg signed [WIDTH-1:0] a, b;
@@ -22,7 +22,7 @@ module alu_tb;
     );
 
     initial begin
-        $dumpfile("waves/alu.vcd");
+        $dumpfile("waves/alu_8bit.vcd");
         $dumpvars(0, uut);
 
         $monitor(

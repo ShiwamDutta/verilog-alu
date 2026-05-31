@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module divider_tb;
+module divider_tb_8bit;
     localparam WIDTH = 8;
 
     reg  signed [WIDTH-1:0] d, m;
@@ -10,7 +10,7 @@ module divider_tb;
     divider #(WIDTH) uut (d, m, q, r, div_by_zero, overflow);
 
     initial begin
-        $dumpfile("waves/divider.vcd");
+        $dumpfile("waves/divider_8bit.vcd");
         $dumpvars(0, uut);
 
         $monitor("%d = %d * %d + %d", d, m, q, r);

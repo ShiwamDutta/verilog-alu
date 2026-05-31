@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module multiplier_8bit_tb;
+module multiplier_tb_8bit;
     localparam WIDTH = 16;
 
     reg  signed [WIDTH-1:0] a, b;
@@ -10,7 +10,7 @@ module multiplier_8bit_tb;
     multiplier #(WIDTH) uut(a, b, product, zero);
 
     initial begin
-        $dumpfile("waves/multiplier.vcd");
+        $dumpfile("waves/multiplier_8bit.vcd");
         $dumpvars(0, uut);
 
         $monitor("%d * %d = %d", a, b, product);
