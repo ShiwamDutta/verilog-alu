@@ -1,27 +1,31 @@
-# Verilog Calculator Chip Design
+# RTL Design and Implementation of an ALU in Verilog
+
+Digital Design • Verilog HDL • RTL Design
 
 ## Overview
 
 This project implements a calculator datapath using Verilog HDL.
-The design follows a modular architecture where each arithmetic unit
-is implemented as an independent module.
+The design follows a modular and scalable architecture where each
+arithmetic unit is implemented as an independent module.
 
-Instead of relying entirely on built-in arithmetic operators,
-the design emphasizes structural implementation of arithmetic
-circuits such as adder, subtractor, multiplier, and divider.
+The modules are parameterized, enabling the datapath width
+to be easily scaled from 8-bit to 16-bit without redesigning
+the arithmetic units.
+
+The core arithmetic operations of the ALU are implemented using
+structural or algorithmic RTL techniques, such as carry lookahead addition,
+Booth multiplication, and restoring division, to realize hardware-level logic.
 
 ## Features
 
 - Modular RTL design using Verilog HDL
-- Structural implementation of arithmetic units
-- Separate modules for:
-  - Adder
-  - Subtractor
+- Dedicated modules for:
+  - Adder / Subtractor
   - Multiplier
   - Divider
-- Arithmetic Logic Unit (ALU) integrating all operations
-- Signed 8-bit arithmetic implementation
-- Testbench based verification
+- Parameterized arithmetic units (default: 8-bit)
+- Integrated ALU (Arithmetic Logic Unit) supporting multiple operations
+- Testbench-based functional verification
 - Waveform analysis using GTKWave
 
 ## Tools
@@ -55,12 +59,27 @@ Fedora: `sudo dnf install gtkwave`
 ```
 calculator_alu_design/
 |
-├── src/           # Verilog source files (modules and ALU)
-├── tb/            # Testbench files
+├── src/           # Parameterized Verilog modules
+├── tb/            # Testbench for individual modules
 ├── build/         # Compiled simulation files
 ├── waves/         # VCD waveform files
 └── graph_images/  # Waveform screenshots for reference
 ```
+
+## ALU Operations
+
+| Opcode (in hex) | Operation      |
+| --------------: | -------------- |
+|               0 | Addition       |
+|               1 | Subtraction    |
+|               2 | Multiplication |
+|               3 | Division       |
+|               4 | AND            |
+|               5 | OR             |
+|               6 | XOR            |
+|               7 | NOT            |
+|               E | Operand 1      |
+|               F | Operand 2      |
 
 ## How to Run
 
